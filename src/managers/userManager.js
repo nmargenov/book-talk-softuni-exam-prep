@@ -67,7 +67,12 @@ async function register(username,email,password,rePassword){
     return token;
 }
 
+function getUserById(userId){
+    return User.findById(userId);
+}
+
 module.exports = {
     register,
-    login
+    login,
+    getUserById,
 }
