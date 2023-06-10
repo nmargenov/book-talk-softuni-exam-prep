@@ -24,7 +24,22 @@ function createBook(title,author,genre,stars,image,bookReview,owner){
     return Book.create(book);
 }
 
+function getBookById(bookId){
+    return Book.findById(bookId);
+}
+
+function wishToRead(bookId,userId){
+    return Book.findByIdAndUpdate(bookId,{$push:{wishingList:userId}});
+}
+
+function checkIfCurrentUserHasWishedTheBook(book,userId){
+    return book.wishingList.map(b=>b.toString()).includes(userId);
+}
+
 module.exports = {
     getAllBooks,
-    createBook
+    createBook,
+    getBookById,
+    wishToRead,
+    checkIfCurrentUserHasWishedTheBook,
 }

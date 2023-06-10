@@ -1,4 +1,4 @@
-const { getAllBooks, createBook } = require('../managers/bookManager');
+const { getAllBooks, createBook, getBookById, wishToRead, checkIfCurrentUserHasWishedTheBook } = require('../managers/bookManager');
 const { mustBeAuth } = require('../middlewares/authMiddleware');
 const { getErrorMessage } = require('../utils/errorHelper');
 
@@ -37,4 +37,43 @@ router.post('/createReview',mustBeAuth,async(req,res)=>{
     }
 });
 
+router.get('/:bookId/details',async(req,res)=>{
+    try{
+        const loggedUser = req.user?._id;
+        const bookId = req.params.bookId;
+        
+        const book = await getBookById(bookId).lean();
+        if(!book){
+            throw new Error();
+        }
+        const isOwner = loggedUser && loggedUser == book.owner;
+        const notOwner = !isOwner;
+        const alreadyWished = notOwner && checkIfCurrentUserHasWishedTheBook(book,loggedUser);
+        res.status(302).render('books/details',{book,loggedUser,isOwner,alreadyWished,notOwner});
+    }catch(err){
+        console.log(err);
+        res.status(404).render('404');
+    }
+});
+
+router.get('/:bookId/wish',mustBeAuth,async(req,res)=>{
+    try{
+        const bookId = req.params.bookId;
+        const loggedUser = req.user._id;
+
+        const book = await getBookById(bookId);
+        if(!book || book.owner == loggedUser){
+            throw new Error();
+        }
+
+        if(checkIfCurrentUserHasWishedTheBook(book,loggedUser)){
+            throw new Error();
+        }
+
+        await wishToRead(bookId,loggedUser);
+        res.redirect(`/books/${bookId}/details`);
+    }catch(err){
+        res.status(404).render('404');
+    }
+});
 module.exports = router;
