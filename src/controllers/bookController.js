@@ -1,4 +1,4 @@
-const { getAllBooks, createBook, getBookById, wishToRead, checkIfCurrentUserHasWishedTheBook, deleteBook } = require('../managers/bookManager');
+const { getAllBooks, createBook, getBookById, wishToRead, checkIfCurrentUserHasWishedTheBook, deleteBook, editBook } = require('../managers/bookManager');
 const { mustBeAuth } = require('../middlewares/authMiddleware');
 const { getErrorMessage } = require('../utils/errorHelper');
 
@@ -92,6 +92,56 @@ router.get('/:bookId/delete',mustBeAuth,async(req,res)=>{
         res.redirect('/books/catalog');
     }catch(err){
         res.status(404).render('404');
+    }
+});
+
+router.get('/:bookId/edit',mustBeAuth,async(req,res)=>{
+    try{
+        const bookId = req.params.bookId;
+        const loggedUser = req.user._id;
+
+        const book = await getBookById(bookId).lean();
+        if(!book || book.owner != loggedUser){
+            throw new Error();
+        }
+
+        res.status(302).render('books/edit',{book});        
+    }catch(err){
+        res.status(404).render('404');
+    }
+});
+
+router.post('/:bookId/edit',mustBeAuth,async(req,res)=>{
+    const title = req.body.title?.trim();
+    const author = req.body.author?.trim();
+    const genre = req.body.genre?.trim();
+    const stars = req.body.stars?.trim();
+    const image = req.body.image?.trim();
+    const bookReview = req.body.bookReview?.trim();
+
+    const book = {
+        title,
+        author,
+        genre,
+        stars,
+        image,
+        bookReview
+    }
+
+    try{
+        const bookId = req.params.bookId;
+        const loggedUser = req.user._id;
+
+        const book = await getBookById(bookId).lean();
+        if(!book || book.owner != loggedUser){
+            throw new Error();
+        }
+
+        await editBook(bookId,title,author,genre,stars,image,bookReview);
+        res.redirect(`/books/${book._id}/details`);
+    }catch(err){
+        const error = getErrorMessage(err);
+        res.status(400).render('books/edit',{error,book});
     }
 });
 module.exports = router;

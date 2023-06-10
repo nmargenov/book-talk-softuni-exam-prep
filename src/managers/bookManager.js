@@ -40,6 +40,23 @@ function checkIfCurrentUserHasWishedTheBook(book,userId){
     return book.wishingList.map(b=>b.toString()).includes(userId);
 }
 
+function editBook(bookId,title,author,genre,stars,image,bookReview){
+    if(!pattern.test(image)){
+        throw new Error('The URL for the image is invalid!');
+    }
+    
+    const book = {
+        title,
+        author,
+        genre,
+        stars,
+        image,
+        bookReview,
+    };
+
+    return Book.findByIdAndUpdate(bookId,book,{runValidators:true});
+}
+
 module.exports = {
     getAllBooks,
     createBook,
@@ -47,4 +64,5 @@ module.exports = {
     wishToRead,
     checkIfCurrentUserHasWishedTheBook,
     deleteBook,
+    editBook,
 }
