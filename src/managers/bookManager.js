@@ -32,6 +32,10 @@ function wishToRead(bookId,userId){
     return Book.findByIdAndUpdate(bookId,{$push:{wishingList:userId}});
 }
 
+function deleteBook(bookId){
+    return Book.findByIdAndDelete(bookId);
+}
+
 function checkIfCurrentUserHasWishedTheBook(book,userId){
     return book.wishingList.map(b=>b.toString()).includes(userId);
 }
@@ -42,4 +46,5 @@ module.exports = {
     getBookById,
     wishToRead,
     checkIfCurrentUserHasWishedTheBook,
+    deleteBook,
 }

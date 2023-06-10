@@ -1,4 +1,4 @@
-const { getAllBooks, createBook, getBookById, wishToRead, checkIfCurrentUserHasWishedTheBook } = require('../managers/bookManager');
+const { getAllBooks, createBook, getBookById, wishToRead, checkIfCurrentUserHasWishedTheBook, deleteBook } = require('../managers/bookManager');
 const { mustBeAuth } = require('../middlewares/authMiddleware');
 const { getErrorMessage } = require('../utils/errorHelper');
 
@@ -72,6 +72,24 @@ router.get('/:bookId/wish',mustBeAuth,async(req,res)=>{
 
         await wishToRead(bookId,loggedUser);
         res.redirect(`/books/${bookId}/details`);
+    }catch(err){
+        res.status(404).render('404');
+    }
+});
+
+router.get('/:bookId/delete',mustBeAuth,async(req,res)=>{
+    try{
+        const bookId = req.params.bookId;
+        const loggedUser = req.user._id;
+
+        const book = await getBookById(bookId);
+        if(!book || book.owner != loggedUser){
+            throw new Error();
+        }
+
+        await deleteBook(bookId);
+
+        res.redirect('/books/catalog');
     }catch(err){
         res.status(404).render('404');
     }

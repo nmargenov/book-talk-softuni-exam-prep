@@ -12,8 +12,8 @@
             {{#if loggedUser}}
             <div class="buttons">
                 {{#if isOwner}}
-                <a href="#" class="btn-edit">Edit</a>
-                <a href="#" class="btn-delete">Delete</a>
+                <a href="/books/{{book._id}}/edit" class="btn-edit">Edit</a>
+                <a href="/books/{{book._id}}/delete" class="btn-delete">Delete</a>
                 {{/if}}
                 {{#if notOwner}}
                 {{#if alreadyWished}}
