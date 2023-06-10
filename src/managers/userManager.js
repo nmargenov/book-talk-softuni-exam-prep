@@ -4,17 +4,17 @@ const User = require("../models/User");
 const { sign } = require('../lib/jwt');
 const { SECRET } = require('../config/config');
 
-async function login(username,password){
-    const user = await User.findOne({username});
+async function login(email,password){
+    const user = await User.findOne({email});
 
     if(!user){
-        throw new Error("Username or password don't match!");
+        throw new Error("Email or password don't match!");
     }
 
     const isValidPassword = await bcrypt.compare(password,user.password);
 
     if(!isValidPassword){
-        throw new Error("Username or password don't match!");
+        throw new Error("Email or password don't match!");
     }
 
     const payload = {
@@ -38,8 +38,8 @@ async function register(username,email,password,rePassword){
         throw new Error("Email is already in use!");
     }
 
-    if(password.length<4){
-        throw new Error("Password must be atleast 4 characters long!");
+    if(password.length<3){
+        throw new Error("Password must be atleast 3 characters long!");
     }
     
     if(password != rePassword){
