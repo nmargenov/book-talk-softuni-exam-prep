@@ -19,7 +19,7 @@ router.post('/login',mustBeGuest,async(req,res)=>{
     }
     catch(err){
         const error = getErrorMessage(err);
-        res.render('users/login',{error,email});
+        res.status(400).render('users/login',{error,email});
     }
 })
 
@@ -39,7 +39,7 @@ router.post('/register',mustBeGuest,async(req,res)=>{
         res.redirect('/');
     }catch(err){
         const error = getErrorMessage(err);
-        res.render('users/register',{error,username,email});
+        res.status(400).render('users/register',{error,username,email});
     }
 });
 
